@@ -3,12 +3,10 @@ const expect = chai.expect;
 const supertest = require('supertest');
 
 // import your app here
-const app = require('../.');
-
+const app = require('../src/study');
 const agent = supertest.agent(app);
 
 describe('User API Test', () => {
-
 
     before(async () => {
         // run a single time before tests
@@ -36,7 +34,7 @@ describe('User API Test', () => {
         expect(res.text).to.be.equals('Hello zeca!');
     });
 
-    after(async () => {
+    afterEach(async () => {
         // run N times after each test
     });
 
