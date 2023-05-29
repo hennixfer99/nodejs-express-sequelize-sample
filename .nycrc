@@ -2,7 +2,9 @@
   "exclude": [
     "tests/",
     "index.js/",
-    "coverage/"
+    "coverage/",
+    "database/",
+    "models/"
   ],
   "all": true
 }

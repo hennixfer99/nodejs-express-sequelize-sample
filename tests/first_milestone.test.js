@@ -3,13 +3,15 @@ const expect = chai.expect;
 const supertest = require('supertest');
 
 // import your app here
-const app = require('../src/study');
+const { sequelize } = require('../src/database/api')
+const app = require('../src/routes/routes.js');
 const agent = supertest.agent(app);
 
 describe('User API Test', () => {
 
     before(async () => {
-        // run a single time before tests
+            await sequelize.authenticate()
+            await sequelize.sync()
     });
 
     beforeEach(async () => {
