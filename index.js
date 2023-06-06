@@ -1,6 +1,7 @@
 const app = require('./src/routes/routes');
 const {sequelize} = require('./src/database/api')
 const port = 3000;
+const {db} = require("./src/database/api")
 
 async function init() {
     try{

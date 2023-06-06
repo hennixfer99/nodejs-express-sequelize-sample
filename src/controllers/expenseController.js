@@ -4,33 +4,36 @@ class ExpenseControl {
 
     async getBills(req, res) {
         try {
-            await db.Control.findAll().then((control) => {
-                if (control) {
-                    return res.json(control);
+            const control = await db.Control.findAll({
+                include: [{
+                    model: db.Payment
+                },
+                {
+                    model: db.ControlType
                 }
-                res.status(404).json({ message: "Nenhum gasto foi encontrado" });
-            });
+            ],
+            })
+            return res.json(control)
         } catch (err) {
             console.log(err)
+            res.status(500).json({ message: "Ocorreu um erro no servidor" });
         }
     };
 
     async createNewBill(req, res) {
         try {
             const { price, bill, category } = req.body;
-            //    const newCategory = await db.Control.findOne({where: {category}});
+            if (typeof price !== "number") {
+                return res.status(400).json({ message: "Parâmetro inválido" })
+            }
 
-            //     if(newCategory.upperCase() === req.body.category.upperCase()) {
-            //         req.body.category = newCategory;
-            //     };
+            const control = await db.Control.create({ price, bill, category })
 
-            await db.Control.create({ price, bill, category }).then((control) => {
-                res.json(control)
-            });
+            return res.status(201).json(control)
 
-            return res.status(200).json({ message: "Gasto criado" })
         } catch (err) {
             console.log(err)
+            res.status(500).json({ message: "Ocorreu um erro no servidor" });
         }
     };
 
@@ -43,25 +46,29 @@ class ExpenseControl {
                 return res.status(404).json({ message: "Gasto não existe" })
             }
 
-            await billControl.update(
-                {
-                    price: price,
-                    bill: bill,
-                    category: category,
-                })
+            billControl.price = price;
+            billControl.bill = bill;
+            billControl.category = category;
 
-            return res.status(200).json({ message: "Gasto atualizado" })
+            await billControl.save();
+
+            return res.status(200).json(billControl)
         } catch (err) {
             console.log(err)
+            res.status(500).json({ message: "Ocorreu um erro no servidor" });
         }
     }
 
     async deleteBill(req, res) {
         try {
-            const billControl = await db.Control.destroy({ where: { id: req.params.id } })
+            const billControl = await db.Control.findOne({ where: { id: req.params.id } })
+
+            await billControl.destroy();
+
             return res.status(200).json({ message: "Gasto deletado :)" })
         } catch (err) {
             console.log(err)
+            res.status(500).json({ message: "Ocorreu um erro no servidor" });
         }
     }
 };

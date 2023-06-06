@@ -2,39 +2,27 @@ const Sequelize = require('sequelize');
 const models = require('../models/expenseControl.models');
 
 const sequelize = new Sequelize('nodejs_express_sequelize_sample', 'root', 'root', {
-    host:'localhost',
+    host: 'localhost',
     dialect: 'mysql',
 });
 
 const db = {
     Control: models.control(sequelize),
+    Payment: models.payment(sequelize),
+    ControlType: models.controlType(sequelize)
 };
 
-module.exports = {db, sequelize}
+db.Control.hasMany(db.Payment);
+db.Payment.belongsTo(db.Control, {
+    onDelete: 'cascade'
+});
 
-// module.exports = {
-//     up(queryInterface, Sequelize) {
-//         return queryInterface.createTable('expense-control', {
-//             id:{
-//                 type: Sequelize.INTEGER,
-//                 primaryKey: true,
-//                 autoIncrement: true,
-//             },
-//             price:{
-//                 type: Sequelize.NUMBER
-//             },
-//             bill:{
-//                 type: Sequelize.STRING
-//             },
-//             category: {
-//                 type: Sequelize.STRING
-//             },
+db.Control.belongsToMany(db.ControlType, {
+    through: 'newTableControlType'
+});
+db.ControlType.belongsToMany(db.Control, {
+    through: 'newTableControlType'
+});
 
-//             createdAt: Sequelize.DATE,
-//             updatedAt: Sequelize.DATE,
-//         })
-//     },
-//     down(queryInterface, Sequelize) {
-//         return queryInterface.dropTable('expense-control');
-//     },
-// }
+module.exports = { db, sequelize }
+
